@@ -1,0 +1,67 @@
+// Archivo: parser.cup
+package mx.unam.aragon.interprete;
+
+import java_cup.runtime.*;
+
+parser code {:
+    // Código de inicialización si es necesario
+:};
+
+/* Terminales (tokens del léxico) */
+terminal
+    // Palabras reservadas
+    LPR, PS, CIR, REC, LIN, C, F, MIENTRAS, MV, OB,
+    // Símbolos
+    PUNTOCOMA, LLAVE, FINLLAVE, COMA, IGUAL, PAR_DER, PAR_IZQ,
+    MAYORQUE, MENORQUE, MAS,
+    // Elementos básicos
+    ENTERO, ID;
+
+/* No terminales */
+non terminal
+    programa, sentencias, sentencia, color, expresion,
+    condicion, bloque;
+
+/* Precedencia */
+precedence left MAYORQUE, MENORQUE;
+precedence left MAS;
+
+/* Reglas gramaticales */
+start with programa;
+
+programa ::= sentencias;
+
+sentencias ::= sentencia | sentencias sentencia;
+
+sentencia ::=
+    LPR PUNTOCOMA                                                 // limpiar;
+  | F IGUAL color PUNTOCOMA                                       // fondo=color;
+  | PS PAR_IZQ expresion COMA expresion PAR_DER PUNTOCOMA         // posicion(num,num);
+  | REC PAR_IZQ expresion COMA expresion COMA color PAR_DER PUNTOCOMA  // rectangulo(num,num,color);
+  | LIN PAR_IZQ expresion COMA expresion COMA color PAR_DER PUNTOCOMA  // linea(num,num,color);
+  | CIR PAR_IZQ expresion COMA expresion COMA color PAR_DER PUNTOCOMA  // circulo(num,num,color);
+  | OB IGUAL LIN PAR_IZQ expresion COMA expresion COMA color PAR_DER PUNTOCOMA  // ob=linea(...);
+  | MIENTRAS PAR_IZQ condicion PAR_DER bloque                     // mientras(a<20){...}
+  | MV PAR_IZQ expresion COMA expresion PAR_DER PUNTOCOMA         // mover(num,num);
+  ;
+
+expresion ::=
+    ENTERO       {: System.out.println("Número: " + $1); :}
+  | ID           {: System.out.println("Variable: " + $1); :}
+  | expresion MAS expresion {: System.out.println("Suma"); :}
+  ;
+
+condicion ::=
+    expresion MENORQUE expresion  {: System.out.println("Condición <"); :}
+  | expresion MAYORQUE expresion  {: System.out.println("Condición >"); :}
+  ;
+
+color ::=
+    ID          {: System.out.println("Color: " + $1); :}
+  | C           {: System.out.println("Color directo"); :}  // Si tienes colores predefinidos
+  ;
+
+bloque ::=
+    LLAVE sentencias FINLLAVE {: System.out.println("Bloque ejecutado"); :}
+  | LLAVE FINLLAVE            {: System.out.println("Bloque vacío"); :}
+  ;

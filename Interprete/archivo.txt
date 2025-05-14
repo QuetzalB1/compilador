@@ -1,0 +1,8 @@
+limpiar;
+fondo = azul;
+posicion(100, 200);
+circulo(50, 50, rojo);
+mientras(x < 10) {
+    mover(5, 5);
+    x = x + 1;
+};
